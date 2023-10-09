@@ -1,8 +1,11 @@
 package br.com.treinaweb.javajobs.config;
 
+import br.com.treinaweb.javajobs.services.AuthenticationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -17,6 +20,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String API_JOBS_URL = "/api/v1/jobs/**";
     private static final String API_USERS_URL = "/api/v1/users/**";
 
+    @Autowired
+    private AuthenticationService authenticationService;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf()
@@ -30,6 +36,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(authenticationService).passwordEncoder(passwordEncoder());
     }
 
     @Bean
