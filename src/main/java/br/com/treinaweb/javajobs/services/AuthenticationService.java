@@ -43,10 +43,26 @@ public class AuthenticationService implements UserDetailsService {
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, password);
         Authentication authenticatedUser = authenticationManager.authenticate(authentication);
 
-        String token = jwtService.gerenateToken(authenticatedUser);
+
+        return createJwtResponse(authenticatedUser);
+
+    }
+
+    public JwtResponse createJwtResponse(String refreshToken) {
+        String username = jwtService.getUsernameFromRefreshToken(refreshToken);
+        String password = loadUserByUsername(username).getPassword();
+
+        Authentication authenticationUser = new UsernamePasswordAuthenticationToken(username, password);
+
+        return createJwtResponse(authenticationUser);
+
+    }
+
+    private JwtResponse createJwtResponse(Authentication authentication) {
+        String token = jwtService.gerenateToken(authentication);
         Date expiresAt = jwtService.getExpirationFromToken(token);
+        String refreshToken = jwtService.generateRefreshToken(authentication.getName());
 
-        return new JwtResponse(token, "Bearer", expiresAt);
-
+        return new JwtResponse(token, "Bearer", expiresAt,refreshToken);
     }
 }

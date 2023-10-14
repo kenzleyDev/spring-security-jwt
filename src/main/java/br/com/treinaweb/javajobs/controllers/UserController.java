@@ -31,4 +31,9 @@ public class UserController {
     public JwtResponse auth(@RequestBody @Valid UserDTO userDTO) {
         return authenticationService.createJwtResponse(userDTO);
     }
+
+    @PostMapping("/refresh/{refreshToken}")
+    public JwtResponse refresh(@PathVariable String refreshToken) {
+        return authenticationService.createJwtResponse(refreshToken);
+    }
 }
